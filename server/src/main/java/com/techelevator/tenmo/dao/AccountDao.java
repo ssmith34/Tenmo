@@ -15,4 +15,5 @@ public interface AccountDao {
     int findIdByUserID(int userID);
 
     boolean create(int userID, BigDecimal balance);
+
 }
