@@ -3,13 +3,16 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.List;
 
@@ -25,7 +28,6 @@ public class AccountController {
         this.userDao = userDao;
         this.accountDao = accountDao;
         this.transferDao = transferDao;
-
     }
 
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
@@ -34,17 +36,13 @@ public class AccountController {
         return accountDao.findByUserID(userID).getBalance();
     }
 
-    @GetMapping(path = "/all-users")
-    public List<User> userList() {
-        return userDao.findAll();
-    }
-
     @PostMapping(path="/transfer")
     public void makeTransfer(@RequestBody Transfer transfer, Principal principal){
-        int senderId = userDao.findIdByUsername(principal.getName());
+        int senderUserId = userDao.findIdByUsername(principal.getName());
+        int senderAccountId = accountDao.findIdByUserID(senderUserId);
         BigDecimal transferAmount = transfer.getAmount();
-        if (transferAmount.compareTo(accountDao.findByUserID(senderId).getBalance()) >= 0){
-            transferDao.makeTransfer(senderId, transfer);
+        if (transferAmount.compareTo(accountDao.findByUserID(senderUserId).getBalance()) <= 0){
+            transferDao.makeTransfer(senderAccountId, transfer);
         }
     }
 }
