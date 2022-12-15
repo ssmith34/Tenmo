@@ -66,17 +66,14 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
         sql = "INSERT INTO account (user_id, balance) VALUES (?, ?) RETURNING account_id;";
         Integer newAccountID;
         BigDecimal initialBalance = new BigDecimal("1000.00");
-
         try {
             newAccountID = jdbcTemplate.queryForObject(sql, Integer.class, newUserId, initialBalance);
         } catch (DataAccessException e) {
             return false;
         }
-
         return true;
     }
 

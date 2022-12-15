@@ -14,20 +14,16 @@ public class JdbcTransferDao implements TransferDao{
 
     private JdbcTemplate jdbcTemplate;
 
-
     @Override
     public List<Transfer> allTransfers() {
         List<Transfer> transfers = new ArrayList<>();
 
-        String sql = "Select transfer_id, sender, receiver, amount, transfer_date, status " +
-                "from transfer;";
+        String sql = "Select transfer_id, sender, receiver, amount, transfer_date, status from transfer;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while(results.next()){
             Transfer transfer = mapRowToTransfer(results);
             transfers.add(transfer);
-
         }
-
         return transfers;
     }
 
@@ -39,16 +35,10 @@ public class JdbcTransferDao implements TransferDao{
         transfer.setAmount(results.getBigDecimal("amount"));
         try{
             transfer.setTransferDate(results.getDate("transfer_date").toLocalDate());
-
-
-        }catch (NullPointerException e) {
-        }
-
+        }catch (NullPointerException e) {}
         transfer.setStatus(results.getString("status"));
-
         return transfer;
     }
-
 
     @Override
     public Transfer getTransfer(int userId) {
@@ -69,8 +59,6 @@ public class JdbcTransferDao implements TransferDao{
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
         newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderId, receiverId, transferAmount,
                 LocalDateTime.now(), "approved");
-        mapRowToTransfer()
-
-        return transfer;
+        return null;
     }
 }
