@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -37,10 +39,10 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer makeTransfer(int senderAccountId, Transfer transfer) {
+    public Transfer makeTransfer(Account senderAccount, Transfer transfer) {
        BigDecimal zero = new BigDecimal("0");
        // Should not be able to send yourself money
-        if (senderAccountId == transfer.getReceiverAccountId()){
+        if (senderAccount.getId() == transfer.getReceiverAccountId()){
             return null;
         }
         // Should not be able to send zero or negative money
@@ -50,11 +52,33 @@ public class JdbcTransferDao implements TransferDao{
         Integer newTransferId;
         String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
-        newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderAccountId,
-                transfer.getReceiverAccountId(),
-                transfer.getAmount(), LocalDateTime.now(), "approved");
-        transfer.setId(newTransferId);
+
+        try {
+            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderAccount.getId(),
+                    transfer.getReceiverAccountId(),
+                    transfer.getAmount(), LocalDateTime.now(), "approved");
+            transfer.setId(newTransferId);
+
+
+            updateTransfer(senderAccount,transfer);
+
+
+        }catch(NullPointerException e){
+            return null;
+        }
+
         return transfer;
+    }
+
+    private void updateTransfer(Account senderAccount, Transfer transfer) {
+
+        String sql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
+        jdbcTemplate.update(sql, transfer.getAmount(), transfer.getSenderAccountId());
+
+        sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
+
+        jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId() );
+
     }
 
     private Transfer mapRowToTransfer(SqlRowSet results) {
