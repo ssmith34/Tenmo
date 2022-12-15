@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class JdbcUserDao implements UserDao {
@@ -19,17 +20,6 @@ public class JdbcUserDao implements UserDao {
 
     public JdbcUserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public int findIdByUsername(String username) {
-        String sql = "SELECT user_id FROM tenmo_user WHERE username ILIKE ?;";
-        Integer id = jdbcTemplate.queryForObject(sql, Integer.class, username);
-        if (id != null) {
-            return id;
-        } else {
-            return -1;
-        }
     }
 
     @Override
@@ -42,6 +32,13 @@ public class JdbcUserDao implements UserDao {
             users.add(user);
         }
         return users;
+    }
+
+    @Override
+    public int findIdByUsername(String username) {
+        String sql = "SELECT user_id FROM tenmo_user WHERE username ILIKE ?;";
+        Integer id = jdbcTemplate.queryForObject(sql, Integer.class, username);
+        return Objects.requireNonNullElse(id, -1);
     }
 
     @Override

@@ -46,19 +46,20 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer makeTransfer(int senderId, int receiverId, BigDecimal transferAmount) {
+    public Transfer makeTransfer(int senderId, Transfer transfer) {
        BigDecimal zero = new BigDecimal("0");
-        if (senderId == receiverId){
+        if (senderId == transfer.getreceiverId()){
             return null;
         }
-        if (transferAmount.compareTo(zero) <= 0) {
+        if (transfer.getAmount().compareTo(zero) <= 0) {
             return null;
         }
         Integer newTransferId;
         String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
-        newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderId, receiverId, transferAmount,
+        newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderId, transfer.getreceiverId(), transfer.getAmount(),
                 LocalDateTime.now(), "approved");
-        return null;
+        transfer.setId(newTransferId);
+        return transfer;
     }
 }

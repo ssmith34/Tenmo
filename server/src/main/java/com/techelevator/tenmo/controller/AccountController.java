@@ -39,12 +39,12 @@ public class AccountController {
         return userDao.findAll();
     }
 
-    @PostMapping(path="/transfer/{receiverId}")
-    public void makeTransfer(@Valid @PathVariable int receiverId, @RequestBody Transfer transfer, Principal principal){
+    @PostMapping(path="/transfer")
+    public void makeTransfer(@RequestBody Transfer transfer, Principal principal){
         int senderId = userDao.findIdByUsername(principal.getName());
         BigDecimal transferAmount = transfer.getAmount();
         if (transferAmount.compareTo(accountDao.findByUserID(senderId).getBalance()) >= 0){
-            transferDao.makeTransfer(senderId, receiverId, transferAmount);
+            transferDao.makeTransfer(senderId, transfer);
         }
     }
 }
