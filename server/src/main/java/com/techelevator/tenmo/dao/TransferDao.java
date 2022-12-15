@@ -9,4 +9,6 @@ public interface TransferDao {
     List<Transfer> allTransfers();
     Transfer getTransfer(int userId);
     Transfer makeTransfer(Account senderId, Transfer transfer);
+    Transfer requestTransfer(Account senderId, Transfer transfer);
+    List<Transfer> getHistory(int accountID);
 }

@@ -2,12 +2,10 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class JdbcTransferDao implements TransferDao{
     public List<Transfer> allTransfers() {
         List<Transfer> transfers = new ArrayList<>();
 
-        String sql = "Select transfer_id, sender, receiver, amount, transfer_date, status from transfer;";
+        String sql = "SELECT transfer_id, sender, receiver, amount, transfer_date, status FROM transfer;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while(results.next()){
             Transfer transfer = mapRowToTransfer(results);
@@ -34,39 +32,45 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer getTransfer(int userId) {
-        return null;
+    public Transfer getTransfer(int transferId) {
+        Transfer transfer = null;
+        String sql = "SELECT transfer_id, sender, receiver, amount, transfer_date, " +
+                "status FROM transfer WHERE transfer_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferId);
+        if (results.next()) {
+            transfer = mapRowToTransfer(results);
+        }
+        return transfer;
     }
 
     @Override
     public Transfer makeTransfer(Account senderAccount, Transfer transfer) {
-       BigDecimal zero = new BigDecimal("0");
-       // Should not be able to send yourself money
-        if (senderAccount.getId() == transfer.getReceiverAccountId()){
-            return null;
-        }
-        // Should not be able to send zero or negative money
-        if (transfer.getAmount().compareTo(zero) <= 0) {
-            return null;
-        }
         Integer newTransferId;
         String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
-
         try {
-            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderAccount.getId(),
-                    transfer.getReceiverAccountId(),
+            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderAccount.getId(), transfer.getReceiverAccountId(),
                     transfer.getAmount(), LocalDateTime.now(), "approved");
             transfer.setId(newTransferId);
-
-
             updateTransfer(senderAccount,transfer);
-
-
         }catch(NullPointerException e){
             return null;
         }
+        return transfer;
+    }
 
+    @Override
+    public Transfer requestTransfer(Account requestingAccount, Transfer transfer) {
+        Integer newTransferId;
+        String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
+                "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
+        try {
+            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, requestingAccount.getId(),
+                    transfer.getReceiverAccountId(), transfer.getAmount(), LocalDateTime.now(), "pending");
+            transfer.setId(newTransferId);
+        } catch (NullPointerException e) {
+            return null;
+        }
         return transfer;
     }
 
@@ -79,6 +83,19 @@ public class JdbcTransferDao implements TransferDao{
 
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId() );
 
+    }
+
+    @Override
+    public List<Transfer> getHistory(int accountID) {
+        List<Transfer> transfers = new ArrayList<>();
+        String sql = "SELECT transfer_id, sender, receiver, amount, transfer_date, status " +
+                "FROM transfer WHERE sender = ? OR receiver = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountID, accountID);
+        while (results.next()) {
+            Transfer transfer = mapRowToTransfer(results);
+            transfers.add(transfer);
+        }
+        return transfers;
     }
 
     private Transfer mapRowToTransfer(SqlRowSet results) {
