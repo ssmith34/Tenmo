@@ -10,5 +10,5 @@ public interface TransferDao {
 
     Transfer getTransfer(int userId);
 
-    boolean makeTransfer (int senderId, int recieverId, BigDecimal transferAmount);
+    boolean makeTransfer (int senderId, int receiverId, BigDecimal transferAmount);
 }

@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Component
@@ -34,7 +35,7 @@ public class JdbcTransferDao implements TransferDao{
         Transfer transfer = new Transfer();
         transfer.setId(results.getInt("transfer_id"));
         transfer.setSenderId(results.getInt("sender"));
-        transfer.setRecieverId(results.getInt("receiver"));
+        transfer.setreceiverId(results.getInt("receiver"));
         transfer.setAmount(results.getBigDecimal("amount"));
         try{
             transfer.setTransferDate(results.getDate("transfer_date").toLocalDate());
@@ -55,16 +56,21 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public boolean makeTransfer(int senderId, int receiverId, BigDecimal transferAmount) {
+    public Transfer makeTransfer(int senderId, int receiverId, BigDecimal transferAmount) {
        BigDecimal zero = new BigDecimal("0");
         if (senderId == receiverId){
-            return false;
+            return null;
         }
         if (transferAmount.compareTo(zero) <= 0) {
-            return false;
+            return null;
         }
+        Integer newTransferId;
+        String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
+                "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
+        newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderId, receiverId, transferAmount,
+                LocalDateTime.now(), "approved");
+        mapRowToTransfer()
 
-        if (se)
-        return false;
+        return transfer;
     }
 }

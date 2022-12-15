@@ -41,12 +41,12 @@ CREATE SEQUENCE seq_transfer_id
 CREATE TABLE transfer(
 	transfer_id int not null default nextval('seq_transfer_id'),
 	sender int not null, 
-	reciever int not null,
+	receiver int not null,
 	amount numeric (13,2) not null,
 	transfer_date timestamp not null,
 	status varchar (10) not null,
 	constraint PK_transfer primary key (transfer_id),
-	constraint FK_transfer_reciever foreign key (reciever) references account (account_id),
+	constraint FK_transfer_receiver foreign key (receiver) references account (account_id),
 	constraint FK_transfer_sender foreign key (sender) references account (account_id),
 	constraint CHK_status check (status is not null or status in ('Approved', 'Pending'))
 	);

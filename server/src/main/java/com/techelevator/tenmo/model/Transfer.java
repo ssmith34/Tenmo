@@ -49,12 +49,12 @@ public class Transfer {
         this.senderId = senderId;
     }
 
-    public int getRecieverId() {
+    public int getreceiverId() {
         return receiverId;
     }
 
-    public void setRecieverId(int recieverId) {
-        this.receiverId = recieverId;
+    public void setreceiverId(int receiverId) {
+        this.receiverId = receiverId;
     }
 
     public BigDecimal getAmount() {
@@ -86,7 +86,7 @@ public class Transfer {
         return "Transfer{" +
                 "id=" + id +
                 ", senderId=" + senderId +
-                ", recieverId=" + receiverId +
+                ", receiverId=" + receiverId +
                 ", amount=" + amount +
                 ", transferDate=" + transferDate +
                 ", status='" + status + '\'' +
