@@ -5,34 +5,33 @@ import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.techelevator.tenmo.model.UserListDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
-import javax.xml.crypto.dsig.TransformService;
 import java.math.BigDecimal;
-import java.net.http.HttpResponse;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
-public class AccountController {
+public class TenmoController {
 
-    private UserDao userDao;
-    private AccountDao accountDao;
-    private TransferDao transferDao;
-    private ResponseStatus responseStatus;
+    private final UserDao userDao;
+    private final AccountDao accountDao;
+    private final TransferDao transferDao;
 
-    public AccountController(UserDao userDao, AccountDao accountDao, TransferDao transferDao) {
+    public TenmoController(UserDao userDao, AccountDao accountDao, TransferDao transferDao) {
         this.userDao = userDao;
         this.accountDao = accountDao;
         this.transferDao = transferDao;
+    }
+
+    @GetMapping(path = "/all-users")
+    public List<UserListDTO> userList() {
+        return userDao.findAll();
     }
 
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
@@ -44,8 +43,8 @@ public class AccountController {
     @PostMapping(path = "/request")
     public String requestTransfer(@RequestBody Transfer transfer, Principal principal) {
         BigDecimal zero = new BigDecimal("0");
-        int requestingUserID = userDao.findIdByUsername(principal.getName());
         Transfer requestedTransfer = null;
+        int requestingUserID = userDao.findIdByUsername(principal.getName());
         Account requestingAccount = accountDao.findByUserID(requestingUserID);
         if (transfer.getSenderAccountId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request.");

@@ -56,6 +56,14 @@ public class JdbcUserDaoTests extends BaseDaoTests{
         createdObject.setPassword("$2a$10$G/MIQ7pUYupiVi72DxqHquxl73zfd7ZLNBoB2G6zUb.W16imI2.W2");
         createdObject.setActivated(true);
         createdObject.setAuthorities("USER");
-        Assert.assertEquals(createdObject, sut.findByUsername("bob"));
+        assertUsersMatch(createdObject, sut.findByUsername("bob"));
+    }
+
+    private void assertUsersMatch(User expected, User actual) {
+        Assert.assertEquals(expected.getId(), actual.getId());
+        Assert.assertEquals(expected.getUsername(), actual.getUsername());
+        Assert.assertEquals(expected.getPassword(), actual.getPassword());
+        Assert.assertEquals(expected.isActivated(), actual.isActivated());
+        Assert.assertEquals(expected.getAuthorities().toString(), actual.getAuthorities().toString());
     }
 }

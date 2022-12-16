@@ -3,6 +3,7 @@ package com.techelevator.dao;
 import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -25,9 +26,10 @@ public class JdbcAccountDaoTests extends BaseDaoTests {
     public void createAccountTest() {
         boolean userCreated = userdao.create("TEST_USER","test_password");
         Assert.assertTrue(userCreated);
-        Account testAcccount = accountdao.findByUserID(userdao.findByUsername("TEST_USER").getId());
-        // Will pass if ran as group with other test, one of if ran locally in JdbcAccountTest
-        Assert.assertEquals(2004, testAcccount.getId());
+        User testUser = userdao.findByUsername("TEST_USER");
+        int testUserID = testUser.getId();
+        Account testAccount = accountdao.findByUserID(userdao.findByUsername("TEST_USER").getId());
+        Assert.assertEquals(testUserID, testAccount.getUserID());
     }
 
     @Test

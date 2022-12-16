@@ -6,13 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 @Component
 public class JdbcTransferDao implements TransferDao{
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -50,7 +50,7 @@ public class JdbcTransferDao implements TransferDao{
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
         try {
             newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, senderAccount.getId(), transfer.getReceiverAccountId(),
-                    transfer.getAmount(), LocalDateTime.now(), "approved");
+                    transfer.getAmount(), LocalDate.now(), "approved");
             transfer.setId(newTransferId);
             updateTransfer(senderAccount,transfer);
         }catch(NullPointerException e){
@@ -65,8 +65,7 @@ public class JdbcTransferDao implements TransferDao{
         String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
         try {
-            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, requestingAccount.getId(),
-                    transfer.getReceiverAccountId(), transfer.getAmount(), LocalDateTime.now(), "pending");
+            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, requestingAccount.getId(), transfer.getReceiverAccountId(), transfer.getAmount(), LocalDate.now(), "pending");
             transfer.setId(newTransferId);
         } catch (NullPointerException e) {
             return null;
@@ -75,14 +74,11 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     private void updateTransfer(Account senderAccount, Transfer transfer) {
-
         String sql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getSenderAccountId());
 
         sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
-
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId() );
-
     }
 
     @Override
@@ -106,8 +102,10 @@ public class JdbcTransferDao implements TransferDao{
         transfer.setAmount(results.getBigDecimal("amount"));
         try{
             transfer.setTransferDate(results.getDate("transfer_date").toLocalDate());
-        }catch (NullPointerException e) {}
-        transfer.setStatus(results.getString("status"));
+            transfer.setStatus(results.getString("status"));
+        }catch (NullPointerException e) {
+            transfer = null;
+        }
         return transfer;
     }
 }
