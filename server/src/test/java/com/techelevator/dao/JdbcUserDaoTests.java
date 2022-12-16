@@ -1,7 +1,11 @@
 package com.techelevator.dao;
 
 
+import com.techelevator.tenmo.dao.JdbcAccountDao;
+import com.techelevator.tenmo.dao.JdbcTransferDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
+import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,6 +13,7 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 
 public class JdbcUserDaoTests extends BaseDaoTests{
 
@@ -27,5 +32,4 @@ public class JdbcUserDaoTests extends BaseDaoTests{
         User user = sut.findByUsername("TEST_USER");
         Assert.assertEquals("TEST_USER", user.getUsername());
     }
-
 }

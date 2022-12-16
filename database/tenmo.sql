@@ -34,22 +34,20 @@ CREATE TABLE account (
 );
 
 CREATE SEQUENCE seq_transfer_id
-	increment by 1
-	start with 3001
-	no maxvalue;
+	INCREMENT BY 1
+    START WITH 3001
+    NO MAXVALUE;
 	
-CREATE TABLE transfer(
-	transfer_id int not null default nextval('seq_transfer_id'),
-	sender int not null, 
-	receiver int not null,
-	amount numeric (13,2) not null,
-	transfer_date timestamp not null,
-	status varchar (10) not null,
-	constraint PK_transfer primary key (transfer_id),
-	constraint FK_transfer_receiver foreign key (receiver) references account (account_id),
-	constraint FK_transfer_sender foreign key (sender) references account (account_id),
-	constraint CHK_status check (status is not null or status in ('Approved', 'Pending'))
-	);
+CREATE TABLE transfer (
+    transfer_id int NOT NULL DEFAULT nextval(seq_transfer_id),
+    sender int NOT NULL, 
+    receiver int NOT NULL,
+    amount numeric (13, 2) NOT NULL,
+    transfer_date timestamp NOT NULL,
+    status varchar (10) NOT NULL,
+    CONSTRAINT PK_transfer PRIMARY KEY (transfer_id),
+    CONSTRAINT FK_transfer_sender FOREIGN KEY (sender) REFERENCES account (account_id),
+    CONSTRAINT FK_transfer_receiver FOREIGN KEY (receiver) REFERENCES account (account_id),
+    CONSTRAINT CHK_status CHECK (status IS NOT NULL OR status IN('Approved', 'Pending'))
+);
 COMMIT;
-
-select * from transfer

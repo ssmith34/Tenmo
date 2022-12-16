@@ -11,26 +11,16 @@ public class Transfer {
     private BigDecimal amount;
     private LocalDate transferDate;
     private String status;
-    private String userName;
 
     public Transfer(){}
 
-    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, LocalDate transferDate, String status, String userName) {
+    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, LocalDate transferDate, String status) {
         this.id = id;
         this.senderAccountId = senderId;
         this.receiverAccountId = receiverId;
         this.amount = amount;
         this.transferDate = transferDate;
         this.status = status;
-        this.userName = userName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public int getId() {
