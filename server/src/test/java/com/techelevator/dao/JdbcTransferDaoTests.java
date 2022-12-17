@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDate;
 
 public class JdbcTransferDaoTests extends BaseDaoTests {
 
@@ -36,7 +35,7 @@ public class JdbcTransferDaoTests extends BaseDaoTests {
     }
 
     @Test
-    public void getTransfer_should_return_correct_transfer_when_returned() {
+    public void getTransfer_should_return_correct_transfer() {
         Transfer expected = new Transfer(3001, 2001, 2002, new BigDecimal("250.00"),
                 LocalDate.of(2022,12,16),
                 "Approved");

@@ -78,7 +78,7 @@ public class JdbcTransferDao implements TransferDao{
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getSenderAccountId());
 
         sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
-        jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId() );
+        jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId());
     }
 
     @Override
