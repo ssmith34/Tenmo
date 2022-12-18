@@ -82,15 +82,17 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public List<Transfer> getHistory(int accountID) {
-        List<Transfer> transfers = new ArrayList<>();
+    public Transfer[] getHistory(int accountID) {
+        ArrayList<Transfer> transferList = new ArrayList<>();
         String sql = "SELECT transfer_id, sender, receiver, amount, transfer_date, status " +
                 "FROM transfer WHERE sender = ? OR receiver = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountID, accountID);
         while (results.next()) {
             Transfer transfer = mapRowToTransfer(results);
-            transfers.add(transfer);
+            transferList.add(transfer);
         }
+        Transfer[] transfers = new Transfer[transferList.size()];
+        transfers = transferList.toArray(transfers);
         return transfers;
     }
 

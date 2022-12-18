@@ -5,6 +5,7 @@ import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,7 @@ public class TransferService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private String authToken = null;
+
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);
@@ -27,7 +29,9 @@ public class TransferService {
     public Transfer[] getTransfer(){
         Transfer[] transferHistory = null;
         try{
-            transferHistory = restTemplate.exchange(baseUrl + "history", HttpMethod.GET, makeAuthEntity(), Transfer[].class).getBody();
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "history", HttpMethod.GET,
+                    makeAuthEntity(), Transfer[].class);
+            transferHistory = response.getBody();
         }catch(RestClientResponseException e){
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
 

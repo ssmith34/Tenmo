@@ -73,8 +73,8 @@ public class TenmoController {
     }
 
     @GetMapping(path = "/history")
-    public List<Transfer> getHistory(Principal principal) {
-        List<Transfer> transfers;
+    public Transfer[] getHistory(Principal principal) {
+        Transfer[] transfers;
         int userID = userDao.findIdByUsername(principal.getName());
         int accountID = accountDao.findIdByUserID(userID);
         transfers = transferDao.getHistory(accountID);
