@@ -40,6 +40,21 @@ public class TransferService {
         }
         return transferHistory;
     }
+
+    public Transfer getTransfer(int transferId){
+        Transfer transferById = null;
+
+        try{
+            ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl + "history/" + transferId, HttpMethod.GET, makeAuthEntity(), Transfer.class);
+            transferById = response.getBody();
+
+        }catch(RestClientResponseException e){
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        }catch (ResourceAccessException e){
+            BasicLogger.log(e.getMessage());
+        }
+       return transferById;
+    }
 }
 
 

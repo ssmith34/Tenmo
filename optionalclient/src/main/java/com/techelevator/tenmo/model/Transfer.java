@@ -9,12 +9,12 @@ public class Transfer {
     private int senderAccountId;
     private int receiverAccountId;
     private BigDecimal amount;
-    private LocalDate transferDate;
+    private String transferDate;
     private String status;
 
     public Transfer(){}
 
-    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, LocalDate transferDate, String status) {
+    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, String transferDate, String status) {
         this.id = id;
         this.senderAccountId = senderId;
         this.receiverAccountId = receiverId;
@@ -55,11 +55,11 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public LocalDate getTransferDate() {
+    public String getTransferDate() {
         return transferDate;
     }
 
-    public void setTransferDate(LocalDate transferDate) {
+    public void setTransferDate(String transferDate) {
         this.transferDate = transferDate;
     }
 
@@ -74,12 +74,12 @@ public class Transfer {
     @Override
     public String toString() {
         return "Transfer{" +
-                "id=" + id +
-                ", senderId=" + senderAccountId +
-                ", receiverId=" + receiverAccountId +
-                ", amount=" + amount +
-                ", transferDate=" + transferDate +
-                ", status='" + status + '\'' + '}';
+                "id = " + id +
+                ", senderId = " + senderAccountId +
+                ", receiverId = " + receiverAccountId +
+                ", amount = " + amount +
+                ", transferDate = " + transferDate +
+                ", status = '" + status + '\'' + '}';
     }
 
 

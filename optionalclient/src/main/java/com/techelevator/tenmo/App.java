@@ -79,7 +79,8 @@ public class App {
             } else if (menuSelection == 2) {
                 viewTransferHistory();
             }else if (menuSelection ==3){
-                viewTransferById();
+               int transferId =  consoleService.promptForInt("Please enter transfer ID: ");
+                viewTransferById(transferId);
             }else if (menuSelection == 4) {
                 viewPendingRequests();
             } else if (menuSelection == 5) {
@@ -108,7 +109,10 @@ public class App {
         consoleService.printTransferHistory(transferHistory);
 	}
 
-    private void viewTransferById() {
+    private void viewTransferById(int transferId) {
+
+        Transfer transferById = transferService.getTransfer(transferId);
+        consoleService.printTransferById(transferById);
 
     }
 

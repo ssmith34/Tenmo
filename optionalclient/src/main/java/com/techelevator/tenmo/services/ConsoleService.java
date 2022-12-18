@@ -106,4 +106,14 @@ public class ConsoleService {
 
     }
 
+    public void printTransferById( Transfer transferById){
+        if (transferById == null) {
+            System.out.println("Transfer ID not valid");
+
+        }
+
+        System.out.println(transferById.toString());
+
+    }
+
 }
