@@ -1,12 +1,14 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class ConsoleService {
+
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -39,9 +41,10 @@ public class ConsoleService {
         System.out.println();
         System.out.println("1: View your current balance");
         System.out.println("2: View your past transfers");
-        System.out.println("3: View your pending requests");
-        System.out.println("4: Send TE bucks");
-        System.out.println("5: Request TE bucks");
+        System.out.println("3: View transfer by ID");
+        System.out.println("4: View your pending requests");
+        System.out.println("5: Send TE bucks");
+        System.out.println("6: Request TE bucks");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -90,6 +93,17 @@ public class ConsoleService {
 
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
+    }
+
+    public void printTransferHistory(Transfer[] transferHistory){
+        if(transferHistory == null){
+            System.out.println("No history found");
+        }
+
+        for (int i = 0; i < transferHistory.length; i++){
+            System.out.println(transferHistory[i].toString());
+        }
+
     }
 
 }

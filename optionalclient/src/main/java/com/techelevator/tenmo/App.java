@@ -1,10 +1,9 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.tenmo.services.UserService;
+import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
 
@@ -12,6 +11,8 @@ public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
     private final UserService userService = new UserService();
+    private final TransferService transferService = new TransferService();
+    private final AccountService accountService = new AccountService();
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
@@ -27,6 +28,10 @@ public class App {
         loginMenu();
         if (currentUser != null) {
             userService.setAuthToken(currentUser.getToken());
+            transferService.setAuthToken(currentUser.getToken());
+            accountService.setAuthToken(currentUser.getToken());
+
+
             mainMenu();
         }
     }
@@ -73,11 +78,13 @@ public class App {
                 viewCurrentBalance();
             } else if (menuSelection == 2) {
                 viewTransferHistory();
-            } else if (menuSelection == 3) {
+            }else if (menuSelection ==3){
+                viewTransferById();
+            }else if (menuSelection == 4) {
                 viewPendingRequests();
-            } else if (menuSelection == 4) {
-                sendBucks();
             } else if (menuSelection == 5) {
+                sendBucks();
+            } else if (menuSelection == 6) {
                 requestBucks();
             } else if (menuSelection == 0) {
                 continue;
@@ -88,15 +95,22 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
+
+
+    private void viewCurrentBalance() {
         BigDecimal balance = userService.getBalance();
         consoleService.printBalance(balance);
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+
+        Transfer[] transferHistory = transferService.getTransfer();
+        consoleService.printTransferHistory(transferHistory);
 	}
+
+    private void viewTransferById() {
+
+    }
 
 	private void viewPendingRequests() {
 		// TODO Auto-generated method stub

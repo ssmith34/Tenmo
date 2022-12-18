@@ -81,4 +81,6 @@ public class Transfer {
                 ", transferDate=" + transferDate +
                 ", status='" + status + '\'' + '}';
     }
+
+
 }
