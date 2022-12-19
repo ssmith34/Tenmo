@@ -7,19 +7,26 @@ public class Transfer {
 
     private int id;
     private int senderAccountId;
+    private String senderName;
     private int receiverAccountId;
+    private String receiverName;
     private BigDecimal amount;
     private LocalDate transferDate;
+    private String transferType;
     private String status;
 
     public Transfer(){}
 
-    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, String transferDate, String status) {
+    public Transfer(int id, int senderId, String senderName, int receiverId, String receiverName, BigDecimal amount,
+                    String transferDate, String transferType, String status) {
         this.id = id;
         this.senderAccountId = senderId;
+        this.senderName = senderName;
         this.receiverAccountId = receiverId;
+        this.receiverName = receiverName;
         this.amount = amount;
         this.transferDate = LocalDate.parse(transferDate);
+        this.transferType = transferType;
         this.status = status;
     }
 
@@ -39,12 +46,28 @@ public class Transfer {
         this.senderAccountId = senderAccountId;
     }
 
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
     public int getReceiverAccountId() {
         return receiverAccountId;
     }
 
     public void setReceiverAccountId(int receiverAccountId) {
         this.receiverAccountId = receiverAccountId;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
     public BigDecimal getAmount() {
@@ -59,8 +82,20 @@ public class Transfer {
         return transferDate;
     }
 
+//    public void setTransferDate(LocalDate transferDate) {
+//        this.transferDate = transferDate;
+//    }
+
     public void setTransferDate(String transferDate) {
         this.transferDate = LocalDate.parse(transferDate);
+    }
+
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
     }
 
     public String getStatus() {
@@ -76,6 +111,4 @@ public class Transfer {
         return id + "          From: " + senderAccountId
                 + "";
     }
-
-
 }

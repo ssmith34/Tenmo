@@ -38,6 +38,27 @@ public class TenmoController {
         return accountDao.findByUserID(userID).getBalance();
     }
 
+    @GetMapping(path = "/transfer-history")
+    public TransferDisplayDTO[] getHistory(Principal principal) {
+        TransferDisplayDTO[] displayTransfers;
+        int userID = userDao.findIdByUsername(principal.getName());
+        int accountID = accountDao.findIdByUserID(userID);
+        displayTransfers = transferDao.getHistory(accountID);
+        if (displayTransfers == null) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+        }
+        return displayTransfers;
+    }
+
+    @GetMapping(path = "/transfer-history/{id}")
+    public TransferDisplayDTO getTransferByID(@PathVariable int id) {
+        TransferDisplayDTO transferDetails = transferDao.getTransferByID(id);
+        if (transferDetails == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Transfer ID.");
+        }
+        return transferDetails;
+    }
+
     @GetMapping(path = "/view-pending-requests")
     public RequestDTO[] getPendingRequests(Principal principal) {
         int userID = userDao.findIdByUsername(principal.getName());
@@ -49,7 +70,27 @@ public class TenmoController {
         return pendingRequests;
     }
 
-    @PostMapping(path = "/request")
+    @PutMapping(path= "/send-money")
+    public void sendMoney(@RequestBody Transfer transfer, Principal principal){
+        Transfer returnTransfer = null;
+        BigDecimal zero = new BigDecimal("0");
+        int senderUserId = userDao.findIdByUsername(principal.getName());
+        transfer.setSenderAccountId(accountDao.findIdByUserID(senderUserId));
+        int actualReceiverID = accountDao.findIdByUserID(transfer.getReceiverAccountId());
+        transfer.setReceiverAccountId(actualReceiverID);
+        // Should not be able to send yourself money or zero or negative money
+        if (transfer.getSenderAccountId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        if (transfer.getAmount().compareTo(accountDao.findByUserID(senderUserId).getBalance()) <= 0){
+           returnTransfer = transferDao.sendMoney(transfer);
+        }
+        if (returnTransfer == null){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping(path = "/request-money")
     public String requestTransfer(@RequestBody Transfer transfer, Principal principal) {
         BigDecimal zero = new BigDecimal("0");
         Transfer requestedTransfer = null;
@@ -58,49 +99,7 @@ public class TenmoController {
         if (transfer.getSenderAccountId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request.");
         }
-        transferDao.requestTransfer(requestingAccount, transfer);
+        transferDao.requestMoney(requestingAccount, transfer);
         return "pending";
-    }
-
-    @PutMapping(path= "/transfer")
-    public void makeTransfer(@RequestBody Transfer transfer, Principal principal){
-        Transfer returnTransfer = null;
-        BigDecimal zero = new BigDecimal("0");
-        int senderUserId = userDao.findIdByUsername(principal.getName());
-        int tempReceiverID = transfer.getReceiverAccountId();
-        transfer.setReceiverAccountId(accountDao.findIdByUserID(tempReceiverID));
-        Account senderAccount = accountDao.findByUserID(senderUserId);
-        BigDecimal transferAmount = transfer.getAmount();
-        // Should not be able to send yourself money or zero or negative money
-        if (senderAccount.getId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        if (transferAmount.compareTo(accountDao.findByUserID(senderUserId).getBalance()) <= 0){
-           returnTransfer = transferDao.makeTransfer(senderAccount, transfer);
-        }
-        if (returnTransfer == null){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-    }
-
-    @GetMapping(path = "/history")
-    public TransferDTO[] getHistory(Principal principal) {
-        TransferDTO[] transfers;
-        int userID = userDao.findIdByUsername(principal.getName());
-        int accountID = accountDao.findIdByUserID(userID);
-        transfers = transferDao.getHistory(accountID);
-        if (transfers == null) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        }
-        return transfers;
-    }
-
-    @GetMapping(path = "/history/{id}")
-    public TransferDTO getTransfer(@PathVariable int id) {
-        TransferDTO transfer = transferDao.getTransfer(id);
-        if (transfer == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Transfer ID.");
-        }
-        return transfer;
     }
 }

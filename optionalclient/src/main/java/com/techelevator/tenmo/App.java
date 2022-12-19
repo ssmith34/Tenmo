@@ -14,6 +14,7 @@ public class App {
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private AuthenticatedUser currentUser;
+    private UserCredentials userCredentials;
 
     public static void main(String[] args) {
         App app = new App();
@@ -57,8 +58,8 @@ public class App {
     }
 
     private void handleLogin() {
-        UserCredentials credentials = consoleService.promptForCredentials();
-        currentUser = authenticationService.login(credentials);
+        userCredentials = consoleService.promptForCredentials();
+        currentUser = authenticationService.login(userCredentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -96,13 +97,14 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-        TransferDTO[] transferHistory = transferService.getTransfers();
-        consoleService.printTransferHistory(transferHistory);
+        TransferDisplayDTO[] transferHistory = transferService.getTransfers();
+        String LoggedInUser = this.currentUser.getUser().getUsername();
+        consoleService.printTransferHistory(transferHistory, LoggedInUser);
 	}
 
     private void viewTransferById() {
         int transferId =  consoleService.promptForInt("Please enter transfer ID: ");
-        Transfer transferById = transferService.getTransfer(transferId);
+        TransferDisplayDTO transferById = transferService.getTransferByID(transferId);
         consoleService.printTransferById(transferById);
     }
 

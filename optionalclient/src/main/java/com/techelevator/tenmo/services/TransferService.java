@@ -2,7 +2,8 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.RequestDTO;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.TransferDTO;
+import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDisplayDTO;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
@@ -32,11 +33,10 @@ public class TransferService {
         this.authToken = authToken;
     }
 
-    public TransferDTO[] getTransfers(){
-        TransferDTO[] transferHistory = null;
+    public TransferDisplayDTO[] getTransfers(){
+        TransferDisplayDTO[] transferHistory = null;
         try {
-            ResponseEntity<TransferDTO[]> response = restTemplate.exchange(baseUrl + "history", HttpMethod.GET,
-                    makeAuthEntity(), TransferDTO[].class);
+            ResponseEntity<TransferDisplayDTO[]> response = restTemplate.exchange(baseUrl + "transfer-history", HttpMethod.GET, makeAuthEntity(), TransferDisplayDTO[].class);
             transferHistory = response.getBody();
         } catch(RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
@@ -47,10 +47,11 @@ public class TransferService {
         return transferHistory;
     }
 
-    public Transfer getTransfer(int transferId) {
-        Transfer transferById = null;
+    public TransferDisplayDTO getTransferByID(int transferId) {
+        TransferDisplayDTO transferById = null;
         try {
-            ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl + "history/" + transferId, HttpMethod.GET, makeAuthEntity(), Transfer.class);
+            ResponseEntity<TransferDisplayDTO> response = restTemplate.exchange(baseUrl + "transfer-history/" + transferId,
+                    HttpMethod.GET, makeAuthEntity(), TransferDisplayDTO.class);
             transferById = response.getBody();
 
         } catch(RestClientResponseException e){
@@ -79,7 +80,7 @@ public class TransferService {
         HttpEntity<Transfer> entity = makeTransferEntity(newTransfer);
         boolean success = false;
         try {
-            restTemplate.put(baseUrl + "transfer",  entity);
+            restTemplate.put(baseUrl + "send-money", entity);
             success = true;
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());

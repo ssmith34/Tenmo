@@ -90,23 +90,29 @@ public class ConsoleService {
         scanner.nextLine();
     }
 
-    public void printTransferHistory(TransferDTO[] transferHistory){
+    public void printTransferHistory(TransferDisplayDTO[] transferHistory, String LoggedInUser){
         if(transferHistory == null){
             System.out.println("No transfers found.");
         }
         System.out.print("-------------------------------------------\n" + "Transfers\n" +
                 "ID          From/To                 Amount\n" + "-------------------------------------------\n");
-        for (int i = 0; i < transferHistory.length; i++){
-            System.out.println(transferHistory[i].toString());
+        assert transferHistory != null;
+        for (TransferDisplayDTO transferDisplayDTO : transferHistory) {
+            System.out.println(transferDisplayDTO.toString(LoggedInUser));
         }
-        System.out.println("\n---------");
+        System.out.println("---------");
     }
 
-    public void printTransferById( Transfer transferById){
+    public void printTransferById(TransferDisplayDTO transferById){
         if (transferById == null) {
             System.out.println("Transfer ID not valid.");
+            return;
         }
-        System.out.println(transferById.toString());
+        System.out.print("-------------------------------------------\n" +
+                "Transfer Details\n" + "-------------------------------------------\n");
+        System.out.print("Id: " + transferById.getTransferID() + "\nFrom: " + transferById.getSenderUsername() +
+                "\nTo: " + transferById.getReceiverUsername() + "\nType: " + transferById.getTransferType() +
+                "\nStatus: " + transferById.getStatus() + "\nAmount: $" + transferById.getTransferAmount());
     }
 
     public void printPendingRequests(RequestDTO[] pendingRequests) {
