@@ -1,8 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
@@ -15,7 +13,6 @@ public class App {
     private final AccountService accountService = new AccountService();
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-
     private AuthenticatedUser currentUser;
 
     public static void main(String[] args) {
@@ -30,8 +27,6 @@ public class App {
             userService.setAuthToken(currentUser.getToken());
             transferService.setAuthToken(currentUser.getToken());
             accountService.setAuthToken(currentUser.getToken());
-
-
             mainMenu();
         }
     }
@@ -79,8 +74,7 @@ public class App {
             } else if (menuSelection == 2) {
                 viewTransferHistory();
             }else if (menuSelection ==3){
-               int transferId =  consoleService.promptForInt("Please enter transfer ID: ");
-                viewTransferById(transferId);
+                viewTransferById();
             }else if (menuSelection == 4) {
                 viewPendingRequests();
             } else if (menuSelection == 5) {
@@ -96,34 +90,39 @@ public class App {
         }
     }
 
-
-
     private void viewCurrentBalance() {
         BigDecimal balance = userService.getBalance();
         consoleService.printBalance(balance);
 	}
 
 	private void viewTransferHistory() {
-
-        Transfer[] transferHistory = transferService.getTransfer();
+        TransferDTO[] transferHistory = transferService.getTransfers();
         consoleService.printTransferHistory(transferHistory);
 	}
 
-    private void viewTransferById(int transferId) {
-
+    private void viewTransferById() {
+        int transferId =  consoleService.promptForInt("Please enter transfer ID: ");
         Transfer transferById = transferService.getTransfer(transferId);
         consoleService.printTransferById(transferById);
-
     }
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
+		RequestDTO[] pendingRequests = transferService.getPendingRequests();
+        consoleService.printPendingRequests(pendingRequests);
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
+        UserListDTO[] userList = userService.getAllUsers();
+        consoleService.printUserList(userList);
+        int receivingID = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
+		Transfer transfer = new Transfer();
+        transfer.setReceiverAccountId(receivingID);
+        transfer.setAmount(consoleService.promptForBigDecimal("Enter amount: "));
+		boolean success = transferService.sendBucks(transfer);
+        if (success)
+            System.out.println("Transfer successful.");
+        else
+            System.out.println("Transfer failed.");
 	}
 
 	private void requestBucks() {

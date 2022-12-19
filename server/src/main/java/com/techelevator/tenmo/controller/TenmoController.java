@@ -3,9 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserListDTO;
+import com.techelevator.tenmo.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +38,17 @@ public class TenmoController {
         return accountDao.findByUserID(userID).getBalance();
     }
 
+    @GetMapping(path = "/view-pending-requests")
+    public RequestDTO[] getPendingRequests(Principal principal) {
+        int userID = userDao.findIdByUsername(principal.getName());
+        int accountID = accountDao.findIdByUserID(userID);
+        RequestDTO[] pendingRequests = transferDao.getPendingRequests(accountID);
+        if (pendingRequests == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No pending requests.");
+        }
+        return pendingRequests;
+    }
+
     @PostMapping(path = "/request")
     public String requestTransfer(@RequestBody Transfer transfer, Principal principal) {
         BigDecimal zero = new BigDecimal("0");
@@ -53,11 +62,13 @@ public class TenmoController {
         return "pending";
     }
 
-    @PostMapping(path= "/transfer")
+    @PutMapping(path= "/transfer")
     public void makeTransfer(@RequestBody Transfer transfer, Principal principal){
+        Transfer returnTransfer = null;
         BigDecimal zero = new BigDecimal("0");
         int senderUserId = userDao.findIdByUsername(principal.getName());
-        Transfer returnTransfer = null;
+        int tempReceiverID = transfer.getReceiverAccountId();
+        transfer.setReceiverAccountId(accountDao.findIdByUserID(tempReceiverID));
         Account senderAccount = accountDao.findByUserID(senderUserId);
         BigDecimal transferAmount = transfer.getAmount();
         // Should not be able to send yourself money or zero or negative money
@@ -73,8 +84,8 @@ public class TenmoController {
     }
 
     @GetMapping(path = "/history")
-    public Transfer[] getHistory(Principal principal) {
-        Transfer[] transfers;
+    public TransferDTO[] getHistory(Principal principal) {
+        TransferDTO[] transfers;
         int userID = userDao.findIdByUsername(principal.getName());
         int accountID = accountDao.findIdByUserID(userID);
         transfers = transferDao.getHistory(accountID);
@@ -85,8 +96,8 @@ public class TenmoController {
     }
 
     @GetMapping(path = "/history/{id}")
-    public Transfer getTransfer(@PathVariable int id) {
-        Transfer transfer = transferDao.getTransfer(id);
+    public TransferDTO getTransfer(@PathVariable int id) {
+        TransferDTO transfer = transferDao.getTransfer(id);
         if (transfer == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Transfer ID.");
         }

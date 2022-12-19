@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.RequestDTO;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserListDTO;
 

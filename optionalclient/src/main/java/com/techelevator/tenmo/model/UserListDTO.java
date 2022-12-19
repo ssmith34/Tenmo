@@ -23,9 +23,6 @@ public class UserListDTO {
 
     @Override
     public String toString() {
-        return "UserListDTO{" +
-                "username='" + username + '\'' +
-                ", userId=" + userId +
-                '}';
+        return userId + "          " + username;
     }
 }

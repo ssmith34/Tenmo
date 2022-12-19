@@ -1,8 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 
 import java.math.BigDecimal;
 import java.util.Scanner;
@@ -50,7 +49,7 @@ public class ConsoleService {
     }
 
     public void printBalance(BigDecimal balance) {
-        System.out.println("Current Balance: $" + balance);
+        System.out.println("Your current account balance is: $" + balance);
     }
 
     public UserCredentials promptForCredentials() {
@@ -91,29 +90,47 @@ public class ConsoleService {
         scanner.nextLine();
     }
 
-    public void printErrorMessage() {
-        System.out.println("An error occurred. Check the log for details.");
-    }
-
-    public void printTransferHistory(Transfer[] transferHistory){
+    public void printTransferHistory(TransferDTO[] transferHistory){
         if(transferHistory == null){
-            System.out.println("No history found");
+            System.out.println("No transfers found.");
         }
-
+        System.out.print("-------------------------------------------\n" + "Transfers\n" +
+                "ID          From/To                 Amount\n" + "-------------------------------------------\n");
         for (int i = 0; i < transferHistory.length; i++){
             System.out.println(transferHistory[i].toString());
         }
-
+        System.out.println("\n---------");
     }
 
     public void printTransferById( Transfer transferById){
         if (transferById == null) {
-            System.out.println("Transfer ID not valid");
-
+            System.out.println("Transfer ID not valid.");
         }
-
         System.out.println(transferById.toString());
-
     }
 
+    public void printPendingRequests(RequestDTO[] pendingRequests) {
+        if(pendingRequests == null){
+            System.out.println("No requests found.");
+        }
+        for (int i = 0; i < pendingRequests.length; i++){
+            System.out.println(pendingRequests[i].toString());
+        }
+    }
+
+    public void printUserList(UserListDTO[] userList) {
+        if(userList == null){
+            System.out.println("No users found.");
+        }
+        System.out.print("-------------------------------------------\n" + "Users\n" +
+                "ID          Name\n" + "-------------------------------------------\n");
+        for (int i = 0; i < userList.length; i++){
+            System.out.println(userList[i].toString());
+        }
+        System.out.println("\n---------");
+    }
+
+    public void printErrorMessage() {
+        System.out.println("An error occurred. Check the log for details.");
+    }
 }

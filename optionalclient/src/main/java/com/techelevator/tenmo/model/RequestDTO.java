@@ -3,24 +3,20 @@ package com.techelevator.tenmo.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Transfer {
-
+public class RequestDTO {
     private int id;
     private int senderAccountId;
-    private int receiverAccountId;
     private BigDecimal amount;
     private LocalDate transferDate;
-    private String status;
 
-    public Transfer(){}
+    public RequestDTO() {
+    }
 
-    public Transfer(int id, int senderId, int receiverId, BigDecimal amount, String transferDate, String status) {
+    public RequestDTO(int id, int senderAccountId, BigDecimal amount, String transferDate) {
         this.id = id;
-        this.senderAccountId = senderId;
-        this.receiverAccountId = receiverId;
+        this.senderAccountId = senderAccountId;
         this.amount = amount;
         this.transferDate = LocalDate.parse(transferDate);
-        this.status = status;
     }
 
     public int getId() {
@@ -39,14 +35,6 @@ public class Transfer {
         this.senderAccountId = senderAccountId;
     }
 
-    public int getReceiverAccountId() {
-        return receiverAccountId;
-    }
-
-    public void setReceiverAccountId(int receiverAccountId) {
-        this.receiverAccountId = receiverAccountId;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
@@ -63,19 +51,12 @@ public class Transfer {
         this.transferDate = LocalDate.parse(transferDate);
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     @Override
     public String toString() {
-        return id + "          From: " + senderAccountId
-                + "";
+        return "Request: " +
+                "Request Account" + id +
+                ", senderAccountId=" + senderAccountId +
+                ", amount=" + amount +
+                ", transferDate=" + transferDate;
     }
-
-
 }
