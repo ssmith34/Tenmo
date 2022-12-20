@@ -44,10 +44,12 @@ CREATE TABLE transfer(
 	receiver int not null,
 	amount numeric (13,2) not null,
 	transfer_date date not null,
+	transfer_type varchar (10) NOT NULL,
 	status varchar (10) not null,
 	constraint PK_transfer primary key (transfer_id),
 	constraint FK_transfer_receiver foreign key (receiver) references account (account_id),
 	constraint FK_transfer_sender foreign key (sender) references account (account_id),
-	constraint CHK_status check (status is not null or status in ('Approved', 'Pending'))
+	CONSTRAINT CHK_type CHECK (transfer_type IS NOT NULL OR transfer_type IN('Send', 'Request')),
+	constraint CHK_status check (status is not null or status in ('Approved', 'Pending', 'Denied'))
 	);
 COMMIT;

@@ -29,6 +29,13 @@ public class TransferService {
         return new HttpEntity<>(transfer, headers);
     }
 
+    private HttpEntity<Integer> makeIntegerEntity(Integer number) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(authToken);
+        return new HttpEntity<>(number, headers);
+    }
+
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
@@ -95,6 +102,32 @@ public class TransferService {
         boolean success = false;
         try {
             restTemplate.put(baseUrl + "request-money", entity);
+            success = true;
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return success;
+    }
+
+    public boolean approveRequest(Integer transferID) {
+        boolean success = false;
+        try {
+            restTemplate.put(baseUrl + "approve-request/" + transferID, makeAuthEntity());
+            success = true;
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return success;
+    }
+
+    public boolean denyRequest(int transferID) {
+        boolean success = false;
+        try {
+            restTemplate.put(baseUrl + "deny-request/" + transferID, makeAuthEntity());
             success = true;
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());

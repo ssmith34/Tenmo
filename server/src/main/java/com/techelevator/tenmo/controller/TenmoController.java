@@ -52,8 +52,8 @@ public class TenmoController {
     }
 
     @GetMapping(path = "/transfer-history/{id}")
-    public TransferDisplayDTO getTransferByID(@PathVariable int id) {
-        TransferDisplayDTO transferDetails = transferDao.getTransferByID(id);
+    public TransferDisplayDTO getTransferDisplayDTOByID(@PathVariable int id) {
+        TransferDisplayDTO transferDetails = transferDao.getTransferDisplayDTOByID(id);
         if (transferDetails == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Transfer ID.");
         }
@@ -69,6 +69,30 @@ public class TenmoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No pending requests.");
         }
         return pendingRequests;
+    }
+
+    @PutMapping(path = "/approve-request/{transferID}")
+    public void approveRequest(@PathVariable int transferID) {
+        boolean success = false;
+        TransferDisplayDTO approvedTransfer = transferDao.getTransferDisplayDTOByID(transferID);
+        // Cannot send more money than you have
+        Account senderAccount = accountDao.findByUserID(approvedTransfer.getSenderUserID());
+        BigDecimal balance = senderAccount.getBalance();
+
+        if (approvedTransfer.getTransferAmount().compareTo(accountDao.findByUserID(approvedTransfer.getSenderUserID()).getBalance()) <= 0) {
+            Transfer transfer = transferDao.getTransferByID(transferID);
+            success = transferDao.approveRequest(transfer);
+        }
+        if (!success)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping(path = "/deny-request/{transferID}")
+    public void denyRequest(@PathVariable int transferID) {
+        boolean success = false;
+        success = transferDao.denyRequest(transferID);
+        if (!success)
+            throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
     }
 
     @PutMapping(path= "/send-money")
@@ -91,7 +115,7 @@ public class TenmoController {
         }
     }
 
-    @PostMapping(path = "/request-money")
+    @PutMapping(path = "/request-money")
     public void requestTransfer(@RequestBody Transfer transfer, Principal principal) {
         Transfer returnTransfer = null;
         int requestingUserID = userDao.findIdByUsername(principal.getName());

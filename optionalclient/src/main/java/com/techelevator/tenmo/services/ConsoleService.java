@@ -116,11 +116,30 @@ public class ConsoleService {
     }
 
     public void printPendingRequests(RequestDTO[] pendingRequests) {
-        if(pendingRequests == null){
-            System.out.println("No requests found.");
+        if (pendingRequests == null) {
+            System.out.println("No pending requests at this time.");
+            return;
         }
+        System.out.print("-------------------------------------------\n" +
+                "Pending Transfers\nID          To                     Amount\n" +
+                "-------------------------------------------\n");
         for (int i = 0; i < pendingRequests.length; i++){
             System.out.println(pendingRequests[i].toString());
+        }
+    }
+
+    public int printTransferApproval() {
+        System.out.println("1: Approve");
+        System.out.println("2: Reject");
+        System.out.println("0: Don't approve or reject");
+        System.out.println("---------");
+        System.out.println("Please choose an option: ");
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+            }
         }
     }
 

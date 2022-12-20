@@ -1,10 +1,8 @@
 package com.techelevator.tenmo.model;
 
-import org.apache.tomcat.jni.Local;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDate;
+
 
 public class Transfer {
 
@@ -88,10 +86,6 @@ public class Transfer {
     public void setTransferDate(LocalDate transferDate) {
         this.transferDate = transferDate;
     }
-
-//    public void setTransferDate(String transferDate) {
-//        this.transferDate = LocalDate.parse(transferDate);
-//    }
 
     public String getTransferType() {
         return transferType;

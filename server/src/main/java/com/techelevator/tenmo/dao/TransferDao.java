@@ -7,9 +7,12 @@ import java.util.List;
 
 public interface TransferDao {
     List<Transfer> allTransfers();
-    TransferDisplayDTO getTransferByID(int userId);
+    Transfer getTransferByID(int transferId);
+    TransferDisplayDTO getTransferDisplayDTOByID(int transferID);
     Transfer sendMoney(Transfer transfer);
     Transfer requestMoney(Transfer transfer);
     TransferDisplayDTO[] getHistory(int accountID);
     RequestDTO[] getPendingRequests(int accountID);
+    boolean approveRequest(Transfer transfer);
+    boolean denyRequest(int transferID);
 }

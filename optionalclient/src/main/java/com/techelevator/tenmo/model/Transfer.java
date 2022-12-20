@@ -17,15 +17,15 @@ public class Transfer {
 
     public Transfer(){}
 
-    public Transfer(int id, int senderId, String senderName, int receiverId, String receiverName, BigDecimal amount,
-                    String transferDate, String transferType, String status) {
+    public Transfer(int id, int senderId, String senderName, int receiverAccountId, String receiverName, BigDecimal amount,
+                    LocalDate transferDate, String transferType, String status) {
         this.id = id;
         this.senderAccountId = senderId;
         this.senderName = senderName;
-        this.receiverAccountId = receiverId;
+        this.receiverAccountId = receiverAccountId;
         this.receiverName = receiverName;
         this.amount = amount;
-        this.transferDate = LocalDate.parse(transferDate);
+        this.transferDate = transferDate;
         this.transferType = transferType;
         this.status = status;
     }
@@ -82,13 +82,13 @@ public class Transfer {
         return transferDate;
     }
 
-//    public void setTransferDate(LocalDate transferDate) {
-//        this.transferDate = transferDate;
-//    }
-
-    public void setTransferDate(String transferDate) {
-        this.transferDate = LocalDate.parse(transferDate);
+    public void setTransferDate(LocalDate transferDate) {
+        this.transferDate = transferDate;
     }
+
+//    public void setTransferDate(String transferDate) {
+//        this.transferDate = LocalDate.parse(transferDate);
+//    }
 
     public String getTransferType() {
         return transferType;
@@ -108,7 +108,12 @@ public class Transfer {
 
     @Override
     public String toString() {
-        return id + "          From: " + senderAccountId
-                + "";
+        return "Transfer{" +
+                "id=" + id +
+                ", senderId=" + senderAccountId +
+                ", receiverId=" + receiverAccountId +
+                ", amount=" + amount +
+                ", transferDate=" + transferDate +
+                ", status='" + status + '\'' + '}';
     }
 }

@@ -4,37 +4,55 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class RequestDTO {
-    private int id;
-    private int senderAccountId;
+    private int transferID;
+    private int senderAccountID;
+    private int receiverAccountID;
+    private String receiverUsername;
     private BigDecimal amount;
     private LocalDate transferDate;
-    private String status;
 
     public RequestDTO() {
     }
 
-    public RequestDTO(int id, int senderAccountId, BigDecimal amount, LocalDate transferDate, String status) {
-        this.id = id;
-        this.senderAccountId = senderAccountId;
+    public RequestDTO(int transferID, int senderAccountID, int receiverAccountID, String receiverUsername, BigDecimal amount, LocalDate transferDate) {
+        this.transferID = transferID;
+        this.senderAccountID = senderAccountID;
+        this.receiverAccountID = receiverAccountID;
+        this.receiverUsername = receiverUsername;
         this.amount = amount;
         this.transferDate = transferDate;
-        this.status = status;
     }
 
-    public int getId() {
-        return id;
+    public int getTransferID() {
+        return transferID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTransferID(int transferID) {
+        this.transferID = transferID;
     }
 
-    public int getSenderAccountId() {
-        return senderAccountId;
+    public int getSenderAccountID() {
+        return senderAccountID;
     }
 
-    public void setSenderAccountId(int senderAccountId) {
-        this.senderAccountId = senderAccountId;
+    public void setSenderAccountID(int senderAccountID) {
+        this.senderAccountID = senderAccountID;
+    }
+
+    public int getReceiverAccountID() {
+        return receiverAccountID;
+    }
+
+    public void setReceiverAccountID(int receiverAccountID) {
+        this.receiverAccountID = receiverAccountID;
+    }
+
+    public String getReceiverUsername() {
+        return receiverUsername;
+    }
+
+    public void setReceiverUsername(String receiverUsername) {
+        this.receiverUsername = receiverUsername;
     }
 
     public BigDecimal getAmount() {
@@ -53,11 +71,8 @@ public class RequestDTO {
         this.transferDate = transferDate;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    @Override
+    public String toString() {
+        return transferID + "         ";
     }
 }

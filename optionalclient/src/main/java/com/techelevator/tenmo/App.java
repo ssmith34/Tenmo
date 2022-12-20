@@ -111,9 +111,38 @@ public class App {
 	private void viewPendingRequests() {
 		RequestDTO[] pendingRequests = transferService.getPendingRequests();
         consoleService.printPendingRequests(pendingRequests);
+        int transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        if (transferID == 0) return;
+        int decision = consoleService.printTransferApproval();
+        if (decision == 1) {
+            approveRequest(transferID);
+        } else if (decision == 2) {
+            denyRequest(transferID);
+        } else if (decision == 0) {
+
+        } else
+            System.out.println("Invalid Selection");
 	}
 
-	private void sendBucks() {
+    private void approveRequest(int transferID) {
+        boolean success;
+        success = transferService.approveRequest(transferID);
+        if (success)
+            System.out.println("Approved transfer.");
+        else
+            System.out.println("Error, try again.");
+    }
+
+    private void denyRequest(int transferID) {
+        boolean success;
+        success = transferService.denyRequest(transferID);
+        if (success)
+            System.out.println("Denied request.");
+        else
+            System.out.println("Error, try again.");
+    }
+
+    private void sendBucks() {
         UserListDTO[] userList = userService.getAllUsers();
         consoleService.printUserList(userList);
         int receivingID = consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
@@ -142,7 +171,6 @@ public class App {
             System.out.println("Transfer successful.");
         else
             System.out.println("Transfer failed.");
-		
 	}
 
 }

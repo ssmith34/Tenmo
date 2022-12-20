@@ -34,7 +34,19 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public TransferDisplayDTO getTransferByID(int transferId) {
+    public Transfer getTransferByID(int transferID) {
+        Transfer transfer = null;
+        String sql = "SELECT transfer_id, sender, receiver, amount, transfer_date, status FROM transfer WHERE " +
+                "transfer_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferID);
+        if (results.next()) {
+            transfer = mapRowToTransfer(results);
+        }
+        return transfer;
+    }
+
+    @Override
+    public TransferDisplayDTO getTransferDisplayDTOByID(int transferId) {
         TransferDisplayDTO transferDetails = null;
         String sql = "SELECT t.transfer_id, t.sender, t.receiver, t.amount, t.transfer_date, t.transfer_type, t" +
                 ".status, afrom.user_id " +
@@ -74,12 +86,36 @@ public class JdbcTransferDao implements TransferDao{
                 "VALUES (?, ?, ?, ?, ?, ?) RETURNING transfer_id;";
         try {
             newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, transfer.getSenderAccountId(),
-                    transfer.getReceiverAccountId(), transfer.getAmount(), LocalDate.now(), "" "pending");
+                    transfer.getReceiverAccountId(), transfer.getAmount(), LocalDate.now(), "Request", "pending");
             transfer.setId(newTransferId);
         } catch (NullPointerException e) {
             return null;
         }
         return transfer;
+    }
+
+    @Override
+    public boolean approveRequest(Transfer transfer) {
+        String sql = "UPDATE transfer SET status = ? WHERE transfer_id = ?;";
+        try {
+            jdbcTemplate.update(sql, "Approved", transfer.getId());
+            withdrawFromAccount(transfer);
+            depositToAccount(transfer);
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean denyRequest(int transferID) {
+        String sql = "UPDATE transfer SET status = ? WHERE transfer_id = ?;";
+        try {
+            jdbcTemplate.update(sql, "Denied", transferID);
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     public void depositToAccount(Transfer transfer) {
@@ -112,20 +148,14 @@ public class JdbcTransferDao implements TransferDao{
 
     public RequestDTO[] getPendingRequests(int accountID) {
         ArrayList<RequestDTO> pendingList = new ArrayList<>();
-        String sql = "SELECT transfer_id, sender, amount, transfer_date, status FROM transfer " +
-                "WHERE receiver = ? AND status = ?;";
+        String sql = "SELECT t.transfer_id, t.sender, t.receiver, t.amount, t.transfer_date, afrom.user_id as " +
+                "from_userid, ato.user_id as to_userid, ufrom.username as from_username, uto.username as " +
+                "to_username FROM transfer as t JOIN account as afrom ON t.sender = afrom.account_id JOIN account as " +
+                "ato ON t.receiver = ato.account_id JOIN tenmo_user as ufrom ON afrom.user_id = ufrom.user_id JOIN " +
+                "tenmo_user as uto ON ato.user_id = uto.user_id WHERE sender = ? AND status = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountID, "pending");
         while (results.next()) {
-            RequestDTO requestDTO = new RequestDTO();
-            requestDTO.setId(results.getInt("transfer_id"));
-            requestDTO.setSenderAccountId(results.getInt("sender"));
-            requestDTO.setAmount(results.getBigDecimal("amount"));
-            try {
-                requestDTO.setTransferDate(results.getDate("transfer_date").toLocalDate());
-            } catch (NullPointerException e) {
-                requestDTO = null;
-            }
-            requestDTO.setStatus(results.getString("status"));
+            RequestDTO requestDTO = mapRowToRequestDTO(results);
             pendingList.add(requestDTO);
         }
         RequestDTO[] pendingRequest = new RequestDTO[pendingList.size()];
@@ -137,9 +167,7 @@ public class JdbcTransferDao implements TransferDao{
         Transfer transfer = new Transfer();
         transfer.setId(results.getInt("transfer_id"));
         transfer.setSenderAccountId(results.getInt("sender"));
-        transfer.setSenderName(results.getString("from_username"));
         transfer.setReceiverAccountId(results.getInt("receiver"));
-        transfer.setReceiverName(results.getString("receiver_name"));
         transfer.setAmount(results.getBigDecimal("amount"));
         try{
             transfer.setTransferDate(results.getDate("transfer_date").toLocalDate());
@@ -164,9 +192,24 @@ public class JdbcTransferDao implements TransferDao{
             transferDisplayDTO.setTransferDate(results.getDate("transfer_date").toLocalDate());
             transferDisplayDTO.setTransferType(results.getString("transfer_type"));
             transferDisplayDTO.setStatus(results.getString("status"));
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             transferDisplayDTO = null;
         }
         return transferDisplayDTO;
+    }
+
+    private RequestDTO mapRowToRequestDTO(SqlRowSet results) {
+        RequestDTO requestDTO = new RequestDTO();
+        requestDTO.setTransferID(results.getInt("transfer_id"));
+        requestDTO.setSenderAccountID(results.getInt("sender"));
+        requestDTO.setReceiverAccountID(results.getInt("receiver"));
+        requestDTO.setReceiverUsername(results.getString("to_username"));
+        requestDTO.setAmount(results.getBigDecimal("amount"));
+        try {
+            requestDTO.setTransferDate(results.getDate("transfer_date").toLocalDate());
+        } catch (NullPointerException e) {
+            requestDTO = null;
+        }
+        return requestDTO;
     }
 }
