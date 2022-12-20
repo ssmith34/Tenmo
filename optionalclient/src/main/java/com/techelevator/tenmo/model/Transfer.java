@@ -86,10 +86,6 @@ public class Transfer {
         this.transferDate = transferDate;
     }
 
-//    public void setTransferDate(String transferDate) {
-//        this.transferDate = LocalDate.parse(transferDate);
-//    }
-
     public String getTransferType() {
         return transferType;
     }

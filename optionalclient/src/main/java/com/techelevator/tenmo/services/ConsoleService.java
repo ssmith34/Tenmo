@@ -123,9 +123,8 @@ public class ConsoleService {
         System.out.print("-------------------------------------------\n" +
                 "Pending Transfers\nID          To                     Amount\n" +
                 "-------------------------------------------\n");
-        for (int i = 0; i < pendingRequests.length; i++){
+        for (int i = 0; i < pendingRequests.length; i++)
             System.out.println(pendingRequests[i].toString());
-        }
     }
 
     public int printTransferApproval() {
@@ -144,14 +143,12 @@ public class ConsoleService {
     }
 
     public void printUserList(UserListDTO[] userList) {
-        if(userList == null){
+        if(userList == null)
             System.out.println("No users found.");
-        }
         System.out.print("-------------------------------------------\n" + "Users\n" +
                 "ID          Name\n" + "-------------------------------------------\n");
-        for (int i = 0; i < userList.length; i++){
+        for (int i = 0; i < userList.length; i++)
             System.out.println(userList[i].toString());
-        }
         System.out.println("\n---------");
     }
 

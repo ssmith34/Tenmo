@@ -29,13 +29,6 @@ public class TransferService {
         return new HttpEntity<>(transfer, headers);
     }
 
-    private HttpEntity<Integer> makeIntegerEntity(Integer number) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(authToken);
-        return new HttpEntity<>(number, headers);
-    }
-
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
@@ -137,5 +130,3 @@ public class TransferService {
         return success;
     }
 }
-
-

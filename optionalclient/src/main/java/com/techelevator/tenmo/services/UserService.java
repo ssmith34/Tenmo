@@ -23,7 +23,7 @@ public class UserService {
         BigDecimal balance = null;
         try {
             balance = restTemplate.exchange(baseUrl + "balance", HttpMethod.GET,
-                            makeAuthEntity(), BigDecimal.class).getBody();
+                    makeAuthEntity(), BigDecimal.class).getBody();
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
         } catch (ResourceAccessException e) {
@@ -45,6 +45,7 @@ public class UserService {
         }
         return userList;
     }
+
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);

@@ -19,9 +19,7 @@ public class TransferDisplayDTO {
 
     public TransferDisplayDTO() {}
 
-    public TransferDisplayDTO(int transferID, int senderAccountID, int senderUserID, String senderUsername,
-                              int receiverAccountID, int receiverUserID, String receiverUsername,
-                              BigDecimal transferAmount, String transferDate, String transferType, String status) {
+    public TransferDisplayDTO(int transferID, int senderAccountID, int senderUserID, String senderUsername, int receiverAccountID, int receiverUserID, String receiverUsername, BigDecimal transferAmount, String transferDate, String transferType, String status) {
         this.transferID = transferID;
         this.senderAccountID = senderAccountID;
         this.senderUserID = senderUserID;

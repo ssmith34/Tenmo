@@ -10,11 +10,9 @@ public class App {
     private static final String API_BASE_URL = "http://localhost:8080/";
     private final UserService userService = new UserService();
     private final TransferService transferService = new TransferService();
-    private final AccountService accountService = new AccountService();
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private AuthenticatedUser currentUser;
-    private UserCredentials userCredentials;
 
     public static void main(String[] args) {
         App app = new App();
@@ -27,7 +25,6 @@ public class App {
         if (currentUser != null) {
             userService.setAuthToken(currentUser.getToken());
             transferService.setAuthToken(currentUser.getToken());
-            accountService.setAuthToken(currentUser.getToken());
             mainMenu();
         }
     }
@@ -36,11 +33,11 @@ public class App {
         while (menuSelection != 0 && currentUser == null) {
             consoleService.printLoginMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
-            if (menuSelection == 1) {
+            if (menuSelection == 1)
                 handleRegister();
-            } else if (menuSelection == 2) {
+            else if (menuSelection == 2)
                 handleLogin();
-            } else if (menuSelection != 0) {
+            else if (menuSelection != 0) {
                 System.out.println("Invalid Selection");
                 consoleService.pause();
             }
@@ -50,19 +47,17 @@ public class App {
     private void handleRegister() {
         System.out.println("Please register a new user account");
         UserCredentials credentials = consoleService.promptForCredentials();
-        if (authenticationService.register(credentials)) {
+        if (authenticationService.register(credentials))
             System.out.println("Registration successful. You can now login.");
-        } else {
+        else
             consoleService.printErrorMessage();
-        }
     }
 
     private void handleLogin() {
-        userCredentials = consoleService.promptForCredentials();
+        UserCredentials userCredentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(userCredentials);
-        if (currentUser == null) {
+        if (currentUser == null)
             consoleService.printErrorMessage();
-        }
     }
 
     private void mainMenu() {
@@ -70,23 +65,22 @@ public class App {
         while (menuSelection != 0) {
             consoleService.printMainMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
-            if (menuSelection == 1) {
+            if (menuSelection == 1)
                 viewCurrentBalance();
-            } else if (menuSelection == 2) {
+            else if (menuSelection == 2)
                 viewTransferHistory();
-            }else if (menuSelection ==3){
+            else if (menuSelection ==3)
                 viewTransferById();
-            }else if (menuSelection == 4) {
+            else if (menuSelection == 4)
                 viewPendingRequests();
-            } else if (menuSelection == 5) {
+            else if (menuSelection == 5)
                 sendBucks();
-            } else if (menuSelection == 6) {
+            else if (menuSelection == 6)
                 requestBucks();
-            } else if (menuSelection == 0) {
+            else if (menuSelection == 0)
                 continue;
-            } else {
+            else
                 System.out.println("Invalid Selection");
-            }
             consoleService.pause();
         }
     }
@@ -112,15 +106,14 @@ public class App {
 		RequestDTO[] pendingRequests = transferService.getPendingRequests();
         consoleService.printPendingRequests(pendingRequests);
         int transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
-        if (transferID == 0) return;
+        if (transferID == 0)
+            return;
         int decision = consoleService.printTransferApproval();
-        if (decision == 1) {
+        if (decision == 1)
             approveRequest(transferID);
-        } else if (decision == 2) {
+        else if (decision == 2)
             denyRequest(transferID);
-        } else if (decision == 0) {
-
-        } else
+        else if (decision != 0)
             System.out.println("Invalid Selection");
 	}
 
@@ -163,7 +156,7 @@ public class App {
                 "cancel)" +
                 ": ");
         Transfer transfer = new Transfer();
-        // Actually senderUserID
+        // Using SenderAccountID to transmit senderUserID
         transfer.setSenderAccountId(requestedFromUserID);
         transfer.setAmount(consoleService.promptForBigDecimal("Enter amount: "));
         boolean success = transferService.requestBucks(transfer);
@@ -172,5 +165,4 @@ public class App {
         else
             System.out.println("Transfer failed.");
 	}
-
 }
