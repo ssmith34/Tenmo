@@ -128,7 +128,20 @@ public class App {
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
+		UserListDTO[] userList = userService.getAllUsers();
+        consoleService.printUserList(userList);
+        int requestedFromUserID = consoleService.promptForInt("Enter the ID of user you are requesting from (0 to " +
+                "cancel)" +
+                ": ");
+        Transfer transfer = new Transfer();
+        // Actually senderUserID
+        transfer.setSenderAccountId(requestedFromUserID);
+        transfer.setAmount(consoleService.promptForBigDecimal("Enter amount: "));
+        boolean success = transferService.requestBucks(transfer);
+        if (success)
+            System.out.println("Transfer successful.");
+        else
+            System.out.println("Transfer failed.");
 		
 	}
 

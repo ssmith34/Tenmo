@@ -9,7 +9,7 @@ public interface TransferDao {
     List<Transfer> allTransfers();
     TransferDisplayDTO getTransferByID(int userId);
     Transfer sendMoney(Transfer transfer);
-    Transfer requestMoney(Account senderId, Transfer transfer);
+    Transfer requestMoney(Transfer transfer);
     TransferDisplayDTO[] getHistory(int accountID);
     RequestDTO[] getPendingRequests(int accountID);
 }

@@ -20,6 +20,7 @@ public class TenmoController {
     private final UserDao userDao;
     private final AccountDao accountDao;
     private final TransferDao transferDao;
+    private final BigDecimal zero = new BigDecimal("0");
 
     public TenmoController(UserDao userDao, AccountDao accountDao, TransferDao transferDao) {
         this.userDao = userDao;
@@ -73,7 +74,6 @@ public class TenmoController {
     @PutMapping(path= "/send-money")
     public void sendMoney(@RequestBody Transfer transfer, Principal principal){
         Transfer returnTransfer = null;
-        BigDecimal zero = new BigDecimal("0");
         int senderUserId = userDao.findIdByUsername(principal.getName());
         transfer.setSenderAccountId(accountDao.findIdByUserID(senderUserId));
         int actualReceiverID = accountDao.findIdByUserID(transfer.getReceiverAccountId());
@@ -82,6 +82,7 @@ public class TenmoController {
         if (transfer.getSenderAccountId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+        // Cannot send more money than you have in your account
         if (transfer.getAmount().compareTo(accountDao.findByUserID(senderUserId).getBalance()) <= 0){
            returnTransfer = transferDao.sendMoney(transfer);
         }
@@ -91,15 +92,19 @@ public class TenmoController {
     }
 
     @PostMapping(path = "/request-money")
-    public String requestTransfer(@RequestBody Transfer transfer, Principal principal) {
-        BigDecimal zero = new BigDecimal("0");
-        Transfer requestedTransfer = null;
+    public void requestTransfer(@RequestBody Transfer transfer, Principal principal) {
+        Transfer returnTransfer = null;
         int requestingUserID = userDao.findIdByUsername(principal.getName());
-        Account requestingAccount = accountDao.findByUserID(requestingUserID);
+        transfer.setReceiverAccountId(accountDao.findIdByUserID(requestingUserID));
+        int actualSenderAccountID = accountDao.findIdByUserID(transfer.getSenderAccountId());
+        transfer.setSenderAccountId(actualSenderAccountID);
+        // Should not be able to request money from yourself or request zero or negative amount
         if (transfer.getSenderAccountId() == transfer.getReceiverAccountId() || transfer.getAmount().compareTo(zero) <= 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid request.");
         }
-        transferDao.requestMoney(requestingAccount, transfer);
-        return "pending";
+        returnTransfer = transferDao.requestMoney(transfer);
+        if (returnTransfer == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 }

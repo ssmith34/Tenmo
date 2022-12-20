@@ -76,11 +76,25 @@ public class TransferService {
         return pendingRequests;
     }
 
-    public boolean sendBucks(Transfer newTransfer) {
-        HttpEntity<Transfer> entity = makeTransferEntity(newTransfer);
+    public boolean sendBucks(Transfer sendingTransfer) {
+        HttpEntity<Transfer> entity = makeTransferEntity(sendingTransfer);
         boolean success = false;
         try {
             restTemplate.put(baseUrl + "send-money", entity);
+            success = true;
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return success;
+    }
+
+    public boolean requestBucks(Transfer requestingTransfer) {
+        HttpEntity<Transfer> entity = makeTransferEntity(requestingTransfer);
+        boolean success = false;
+        try {
+            restTemplate.put(baseUrl + "request-money", entity);
             success = true;
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());

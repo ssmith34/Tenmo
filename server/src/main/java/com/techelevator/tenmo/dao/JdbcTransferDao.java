@@ -67,6 +67,21 @@ public class JdbcTransferDao implements TransferDao{
         return transfer;
     }
 
+    @Override
+    public Transfer requestMoney(Transfer transfer) {
+        Integer newTransferId;
+        String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, transfer_type, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?) RETURNING transfer_id;";
+        try {
+            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, transfer.getSenderAccountId(),
+                    transfer.getReceiverAccountId(), transfer.getAmount(), LocalDate.now(), "" "pending");
+            transfer.setId(newTransferId);
+        } catch (NullPointerException e) {
+            return null;
+        }
+        return transfer;
+    }
+
     public void depositToAccount(Transfer transfer) {
         String sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getReceiverAccountId());
@@ -75,20 +90,6 @@ public class JdbcTransferDao implements TransferDao{
     private void withdrawFromAccount(Transfer transfer) {
         String sql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
         jdbcTemplate.update(sql, transfer.getAmount(), transfer.getSenderAccountId());
-    }
-
-    @Override
-    public Transfer requestMoney(Account requestingAccount, Transfer transfer) {
-        Integer newTransferId;
-        String sql = "INSERT INTO transfer (sender, receiver, amount, transfer_date, status) " +
-                "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
-        try {
-            newTransferId = jdbcTemplate.queryForObject(sql, Integer.class, requestingAccount.getId(), transfer.getReceiverAccountId(), transfer.getAmount(), LocalDate.now(), "pending");
-            transfer.setId(newTransferId);
-        } catch (NullPointerException e) {
-            return null;
-        }
-        return transfer;
     }
 
     @Override
